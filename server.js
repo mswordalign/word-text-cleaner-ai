@@ -60,7 +60,7 @@ app.post('/translate', async (req, res) => {
       return res.status(400).json({ error: 'No text provided.' });
     }
 
-    const prompt = `Translate the following English text into Telugu. The text is divided into paragraphs separated by blank lines. Translate each paragraph fully and accurately, preserving the exact same number of paragraphs in the same order, separated by a single blank line between paragraphs. Return ONLY the Telugu translation \u2014 no English text, no explanation, no preamble, no markdown formatting.\n\nTEXT TO TRANSLATE:\n${text}`;
+    const prompt = `Translate the following English text into Telugu. The text is divided into paragraphs separated by blank lines. Translate each paragraph fully and accurately, preserving the exact same number of paragraphs in the same order, separated by a single blank line between paragraphs. Return ONLY the Telugu translation, no English text, no explanation, no preamble, no markdown formatting.\n\nTEXT TO TRANSLATE:\n${text}`;
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
