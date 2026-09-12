@@ -22,7 +22,7 @@ app.post('/clean', async (req, res) => {
     const prompt = `Fix this text pasted from a PDF: merge broken line-breaks into flowing paragraphs, fix accidentally joined words caused by missing spaces (e.g. "IndianArmy" -> "Indian Army", "now.Kodavus" -> "now. Kodavus"), and keep the original wording and paragraph count exactly as it would appear in a printed book. Do not rephrase, summarize, or change any words. Return ONLY the cleaned text, with no explanation, no preamble, and no markdown formatting.\n\nTEXT TO FIX:\n${text}`;
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
