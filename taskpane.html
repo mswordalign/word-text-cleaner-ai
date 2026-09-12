@@ -94,7 +94,7 @@
             throw new Error("No cleaned text returned.");
           }
 
-          range.insertText(data.cleaned, Word.InsertLocation.replace);
+          const indented = data.cleaned.split(/\n{2,}/).map(p => "     " + p.trim()).join("\n\n"); range.insertText(indented, Word.InsertLocation.replace);
           await context.sync();
           status.innerText = "Done! Text cleaned.";
         });
@@ -108,3 +108,4 @@
   </script>
 </body>
 </html>
+
