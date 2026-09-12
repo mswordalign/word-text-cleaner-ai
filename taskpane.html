@@ -110,6 +110,10 @@
       }
     }
 
+        function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
     async function translateText() {
       const btn = document.getElementById("translateBtn");
       const status = document.getElementById("status");
@@ -158,16 +162,16 @@
             .map(p => p.trim())
             .filter(p => p.length > 0);
 
-          let bilingual = "";
+          const indent = "&nbsp;".repeat(5);
+          let html = "";
           for (let i = 0; i < paragraphs.length; i++) {
-            bilingual += "     " + paragraphs[i] + "\n\n";
+            html += `<p lang="en-US">${indent}${escapeHtml(paragraphs[i])}</p>`;
             if (teluguParagraphs[i]) {
-              bilingual += "     " + teluguParagraphs[i] + "\n\n";
+              html += `<p lang="te-IN">${indent}${escapeHtml(teluguParagraphs[i])}</p>`;
             }
           }
-          bilingual = bilingual.trim();
 
-          range.insertText(bilingual, Word.InsertLocation.replace);
+          range.insertHtml(html, Word.InsertLocation.replace);
           await context.sync();
           status.innerText = "Done! Bilingual text inserted.";
         });
