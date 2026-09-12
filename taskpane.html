@@ -48,14 +48,17 @@
   <h3>Text Cleaner AI</h3>
   <p style="font-size:13px;">Select the messy pasted text in your document, then click below.</p>
   <button id="cleanBtn">Fix Selected Text</button>
+  <button id="translateBtn">Translate to Telugu</button>
   <p id="status"></p>
   <p class="hint">This merges broken PDF line-breaks into proper paragraphs, fixes joined words, and keeps your original wording unchanged.</p>
 
   <script>
     const BACKEND_URL = "https://word-text-cleaner-ai.onrender.com/clean";
+    const TRANSLATE_URL = "https://word-text-cleaner-ai.onrender.com/translate";
 
     Office.onReady(() => {
       document.getElementById("cleanBtn").onclick = cleanText;
+      document.getElementById("translateBtn").onclick = translateText;
     });
 
     async function cleanText() {
@@ -94,9 +97,79 @@
             throw new Error("No cleaned text returned.");
           }
 
-          const indented = data.cleaned.split(/\n{2,}/).map(p => "     " + p.trim()).join("\n\n"); range.insertText(indented, Word.InsertLocation.replace);
+          const indented = data.cleaned.split(/\n{2,}/).map(p => "     " + p.trim()).join("\n\n");
+          range.insertText(indented, Word.InsertLocation.replace);
           await context.sync();
           status.innerText = "Done! Text cleaned.";
+        });
+      } catch (err) {
+        console.error(err);
+        status.innerText = "Error: " + err.message;
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function translateText() {
+      const btn = document.getElementById("translateBtn");
+      const status = document.getElementById("status");
+      btn.disabled = true;
+      status.innerText = "Reading selection...";
+
+      try {
+        await Word.run(async (context) => {
+          const range = context.document.getSelection();
+          range.load("text");
+          await context.sync();
+
+          const original = range.text;
+          if (!original || !original.trim()) {
+            status.innerText = "Please select some text first.";
+            btn.disabled = false;
+            return;
+          }
+
+          const paragraphs = original
+            .replace(/\r\n/g, "\n")
+            .replace(/\r/g, "\n")
+            .split(/\n{2,}/)
+            .map(p => p.trim())
+            .filter(p => p.length > 0);
+
+          status.innerText = "Translating with AI...";
+
+          const res = await fetch(TRANSLATE_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: paragraphs.join("\n\n") })
+          });
+
+          if (!res.ok) {
+            throw new Error("Backend request failed: " + res.status);
+          }
+
+          const data = await res.json();
+          if (!data.translated) {
+            throw new Error("No translation returned.");
+          }
+
+          const teluguParagraphs = data.translated
+            .split(/\n{2,}/)
+            .map(p => p.trim())
+            .filter(p => p.length > 0);
+
+          let bilingual = "";
+          for (let i = 0; i < paragraphs.length; i++) {
+            bilingual += "     " + paragraphs[i] + "\n\n";
+            if (teluguParagraphs[i]) {
+              bilingual += "     " + teluguParagraphs[i] + "\n\n";
+            }
+          }
+          bilingual = bilingual.trim();
+
+          range.insertText(bilingual, Word.InsertLocation.replace);
+          await context.sync();
+          status.innerText = "Done! Bilingual text inserted.";
         });
       } catch (err) {
         console.error(err);
@@ -108,4 +181,3 @@
   </script>
 </body>
 </html>
-
