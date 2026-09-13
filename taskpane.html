@@ -109,7 +109,7 @@
 
           let html = "";
           cleanedParagraphs.forEach(p => {
-            html += `<p lang="zxx">${indent}${escapeHtml(p)}</p>`;
+            html += `<p lang="zxx" style="mso-ansi-language:zxx;mso-fareast-language:zxx;mso-bidi-language:zxx">${indent}${escapeHtml(p)}</p>`;
           });
 
           range.insertHtml(html, Word.InsertLocation.replace);
@@ -169,15 +169,14 @@
             .map(p => p.trim())
             .filter(p => p.length > 0);
 
-          const indent = "&nbsp;".repeat(5);
+                    const indent = "&nbsp;".repeat(5);
           let html = "";
           for (let i = 0; i < paragraphs.length; i++) {
-            html += `<p lang="zxx">${indent}${escapeHtml(paragraphs[i])}</p>`;
+            html += `<p lang="zxx" style="mso-ansi-language:zxx;mso-fareast-language:zxx;mso-bidi-language:zxx">${indent}${escapeHtml(paragraphs[i])}</p>`;
             if (teluguParagraphs[i]) {
-              html += `<p lang="zxx">${indent}${escapeHtml(teluguParagraphs[i])}</p>`;
+              html += `<p lang="zxx" style="mso-ansi-language:zxx;mso-fareast-language:zxx;mso-bidi-language:zxx">${indent}${escapeHtml(teluguParagraphs[i])}</p>`;
             }
           }
-
           range.insertHtml(html, Word.InsertLocation.replace);
           await context.sync();
           status.innerText = "Done! Bilingual text inserted.";
