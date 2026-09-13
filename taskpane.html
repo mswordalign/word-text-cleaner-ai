@@ -61,6 +61,10 @@
       document.getElementById("translateBtn").onclick = translateText;
     });
 
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
     async function cleanText() {
       const btn = document.getElementById("cleanBtn");
       const status = document.getElementById("status");
@@ -97,8 +101,18 @@
             throw new Error("No cleaned text returned.");
           }
 
-          const indented = data.cleaned.split(/\n{2,}/).map(p => "     " + p.trim()).join("\n\n");
-          range.insertText(indented, Word.InsertLocation.replace);
+          const indent = "&nbsp;".repeat(5);
+          const cleanedParagraphs = data.cleaned
+            .split(/\n{2,}/)
+            .map(p => p.trim())
+            .filter(p => p.length > 0);
+
+          let html = "";
+          cleanedParagraphs.forEach(p => {
+            html += `<p lang="zxx">${indent}${escapeHtml(p)}</p>`;
+          });
+
+          range.insertHtml(html, Word.InsertLocation.replace);
           await context.sync();
           status.innerText = "Done! Text cleaned.";
         });
@@ -108,10 +122,6 @@
       } finally {
         btn.disabled = false;
       }
-    }
-
-        function escapeHtml(str) {
-      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
     async function translateText() {
@@ -165,9 +175,9 @@
           const indent = "&nbsp;".repeat(5);
           let html = "";
           for (let i = 0; i < paragraphs.length; i++) {
-            html += `<p lang="en-US">${indent}${escapeHtml(paragraphs[i])}</p>`;
+            html += `<p lang="zxx">${indent}${escapeHtml(paragraphs[i])}</p>`;
             if (teluguParagraphs[i]) {
-              html += `<p lang="te-IN">${indent}${escapeHtml(teluguParagraphs[i])}</p>`;
+              html += `<p lang="zxx">${indent}${escapeHtml(teluguParagraphs[i])}</p>`;
             }
           }
 
